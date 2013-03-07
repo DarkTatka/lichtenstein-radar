@@ -5,24 +5,29 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="jquery-periodic-updater/min/updater.js"></script>
 </head>
-<body>
-<canvas id="distance" width="340" height="340" data-distance="100"></canvas>
-<canvas id="elevation" width="340" height="340" 
-	data-updistances="[3.0, 2.0]" 
-	data-downdistances="[3.0, 2.0]" 
-	data-noiseup="0.1" 
-	data-noisedown="0.1" 
-	data-upammounts="[1.0, 0.5]"
-	data-downammounts="[1.0, 0.5]"></canvas>
-<canvas id="azimuth" width="340" height="340"
+<body style="background-color:rgb(0,0,0)">
+
+<div style="background-image:url(lichtenstein.jpg); background-repeat:no-repeat;padding-bottom:120px">
+
+<canvas id="azimuth" width="300" height="300"
+	style="padding-left:178px;padding-top:107px"
 	data-leftdistances="[2.0, 4.0]" 
 	data-rightdistances="[2.0, 4.0]" 
 	data-noiseleft="0.1" 
 	data-noiseright="0.1" 
 	data-leftammounts="[1.0, 0.5]"
 	data-rightammounts="[1.0, 0.5]"></canvas>
-<script>
+<canvas id="elevation" width="300" height="300"
+	style="padding-left:180px"
+	data-updistances="[3.0, 2.0]"
+	data-downdistances="[3.0, 2.0]"
+	data-noiseup="0.1" 
+	data-noisedown="0.1" 
+	data-upammounts="[1.0, 0.5]"
+	data-downammounts="[1.0, 0.5]"></canvas>
 
+</div>
+<script>
 if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = (function () {
         return window.webkitRequestAnimationFrame ||
@@ -235,7 +240,8 @@ window.requestAnimationFrame(animateAzimuth);
 window.requestAnimationFrame(animateElevation);
 
 $(function(){                           // Start document ready
-    $.updater({                         // Call the plugin
+    $.updater({
+	method: 'get',                         // Call the plugin
         url: 'data.json',             // Request URL
     },
     function(result, response){   // Callback method..
