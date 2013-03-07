@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+<canvas id="distance" width="340" height="340" data-distance="100"></canvas>
+<canvas id="elevation" width="340" height="340" 
+	data-updistances="[3.0, 2.0]" 
+	data-downdistances="[3.0, 2.0]" 
+	data-noiseup="0.1" 
+	data-noisedown="0.1" 
+	data-upammounts="[1.0, 0.5]"
+	data-downammounts="[1.0, 0.5]"></canvas>
+<canvas id="azimuth" width="340" height="340"
+	data-leftdistances="[2.0, 4.0]" 
+	data-rightdistances="[2.0, 4.0]" 
+	data-noiseleft="0.1" 
+	data-noiseright="0.1" 
+	data-leftammounts="[1.0, 0.5]"
+	data-rightammounts="[1.0, 0.5]"></canvas>
+<script>
+
+if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = (function () {
+        return window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function ( callback,element) {
+            window.setTimeout(callback, 1000 / 60); // Fallback timeout
+        };
+    })();
+}
+
+function doubleSigmoid(x, a, b, c, d)
+{
+	var y1 = a / (1 + Math.exp( -c * (x - b - d/2)) );
+	var y2 = a / (1 + Math.exp( -c * (x - b + d/2)) );
+	return y2 - y1; 
+}
+
+function animateElevation(time) {
+	var canvas = $("#elevation")[0];
+	var ctx = canvas.getContext("2d");
+
+	ctx.clearRect(0,0,canvas.width, canvas.height);
+	ctx.beginPath(); 
+
+	var middle = canvas.height/2;
+	var highLine = middle;
+	var lowLine  = middle;
+	var noiseMultiplier = 50;
+	var noiseBaseline = 10;
+
+// prostredni cara
+	ctx.fillStyle = 'black';
+	var dotSize = 3;
+
+	for (var i = 0; i < 6; i++) {
+		ctx.arc((canvas.width-2*dotSize)/5 * i+dotSize, middle , dotSize, 0, 2 * Math.PI, false);
+	}
+	ctx.fill();
+	ctx.beginPath();
+
+	ctx.moveTo(0, middle);
+	ctx.lineTo(canvas.width, middle)
+
+	ctx.moveTo(0, highLine);
+
+// ziskani dat pro vykresleni
+	var upDistances = $("#elevation").data().updistances;
+	var upAmmounts = $("#elevation").data().upammounts;
+
+	var downDistances =  $("#elevation").data().downdistances;
+	var downAmmounts = $("#elevation").data().downammounts;
+
+	var upNoise = $("#elevation").data().noiseup*noiseMultiplier+noiseBaseline;
+	var downNoise = $("#elevation").data().noisedown*noiseMultiplier+noiseBaseline;
+
+
+// horni cara
+	for (var x = 0; x < canvas.width; x++, x++) {
+		var value = 0;
+		for (var i = 0; i < upDistances.length; i++) {
+			var upDistance = canvas.width - upDistances[i] * (canvas.width/5);
+			value = value + doubleSigmoid(x, upAmmounts[i]*50,upDistance,1,10);
+		}
+		var whiteNoise = Math.random() * upNoise
+		
+		var trueSignal = value + whiteNoise
+
+		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
+		var cutoff = doubleSigmoid(x, 70, 15, 0.4, 30);
+
+		var baseline =  whiteNoise + groundClutter + cutoff;
+
+		if (trueSignal > baseline) {
+			var signal = trueSignal;
+		} else { 
+			var signal = baseline
+		}
+
+		ctx.lineTo(x, highLine - signal)
+	}
+
+// dolnicara
+	ctx.moveTo(0, lowLine);
+	for (var x = 0; x < canvas.width; x++, x++) {
+		var value = 0;		
+		for (var i = 0; i < downDistances.length; i++) {
+			var downDistance = canvas.width - downDistances[i] * (canvas.width/5);
+			value = value + doubleSigmoid(x, downAmmounts[i]*50,downDistance,1,10);
+		}
+		var whiteNoise = Math.random() * downNoise
+
+		var trueSignal = value + whiteNoise
+
+		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
+		var cutoff = doubleSigmoid(x, 70, 15, 0.4, 30);
+
+		var baseline =  whiteNoise + groundClutter + cutoff;
+
+		if (trueSignal > baseline) {
+			var signal = trueSignal;
+		} else { 
+			var signal = baseline
+		}
+
+		ctx.lineTo(x, lowLine + signal)
+	}
+
+	ctx.stroke();
+	window.requestAnimationFrame(animateElevation);
+}
+
+// =============== Azimuth ====================
+function animateAzimuth(time) {
+	var canvas = $("#azimuth")[0];
+	var ctx = canvas.getContext("2d");
+
+	ctx.clearRect(0,0,canvas.width, canvas.height);
+	ctx.beginPath(); 
+
+	var middle = canvas.width/2;
+	var rightLine = middle;
+	var leftLine  = middle;
+	var noiseMultiplier = 40;
+	var noiseBaseline = 10;
+
+// prostredni cara
+	ctx.fillStyle = 'black';
+	var dotSize = 3;
+
+	for (var i = 0; i < 6; i++) {
+		ctx.arc(middle, (canvas.height-2*dotSize)/5 * i+dotSize, dotSize, 0, 2 * Math.PI, false);
+		//ctx.arc(dotSize, (canvas.width-2*dotSize)/5 * i+dotSize, middle , 0, 2 * Math.PI, false);
+	}
+	ctx.fill();
+	ctx.beginPath();
+
+	ctx.moveTo(middle, 0);
+	ctx.lineTo(middle, canvas.height)
+
+	ctx.moveTo(leftLine, 0);
+// ziskani dat pro vykresleni
+	var leftDistances = $("#azimuth").data().leftdistances;
+	var leftAmmounts = $("#azimuth").data().leftammounts;
+
+	var rightDistances =  $("#azimuth").data().rightdistances;
+	var rightAmmounts = $("#azimuth").data().rightammounts;
+	var rightNoise = $("#azimuth").data().noiseright*noiseMultiplier+noiseBaseline;
+	var leftNoise = $("#azimuth").data().noiseleft*noiseMultiplier+noiseBaseline;
+// leva cara
+	for (var y = 0; y < canvas.height; y++, y++, y++) {
+		var value = 0
+		for (var i = 0; i < leftDistances.length; i++) {
+			var leftDistance = canvas.height - leftDistances[i] * (canvas.height/5);
+			value = value + doubleSigmoid(y, leftAmmounts[i]*50,leftDistance,1,10);
+		}
+		var whiteNoise = Math.random() * leftNoise
+		var trueSignal = value + whiteNoise
+
+		var groundClutter = doubleSigmoid(y, 70, canvas.height, 0.4,60);
+		var cutoff = doubleSigmoid(y, 70, 15, 0.4, 30);
+
+		var baseline =  whiteNoise + groundClutter + cutoff;
+
+		if (trueSignal > baseline) {
+			var signal = trueSignal;
+		} else { 
+			var signal = baseline
+		}
+
+		ctx.lineTo(leftLine - signal, y)
+	}
+
+	ctx.moveTo(rightLine, 0);
+	for (var y = 0; y < canvas.height; y++, y++, y++) {
+		var value = 0
+		for (var i = 0; i < rightDistances.length; i++) {
+			var rightDistance = canvas.height - rightDistances[i] * (canvas.height/5);
+			value = value + doubleSigmoid(y, rightAmmounts[i]*50,rightDistance,1,10);
+		}
+		var whiteNoise = Math.random() * rightNoise
+		var trueSignal = value + whiteNoise
+
+		var groundClutter = doubleSigmoid(y, 70, canvas.height, 0.4,60);
+		var cutoff = doubleSigmoid(y, 70, 15, 0.4, 30);
+
+		var baseline =  whiteNoise + groundClutter + cutoff;
+
+		if (trueSignal > baseline) {
+			var signal = trueSignal;
+		} else { 
+			var signal = baseline
+		}
+
+		ctx.lineTo(rightLine + signal, y)
+	}
+
+	ctx.stroke();
+	window.requestAnimationFrame(animateAzimuth);
+}
+
+
+window.requestAnimationFrame(animateAzimuth);
+window.requestAnimationFrame(animateElevation);
+
+</script>
+</body>
