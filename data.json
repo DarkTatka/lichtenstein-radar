@@ -1,0 +1,10 @@
+{
+    "upammounts"    : "[1.0, 1.0]",
+    "updistances"   : "[2.0, 3.0]",
+    "downammounts"  : "[1.0, 1.0]",
+    "downdistances" : "[2.0, 3.0]",
+    "leftammounts"  : "[1.0, 1.0]",
+    "leftdistances" : "[2.0, 3.0]",
+    "rightammounts" : "[1.0, 1.0]",
+    "rightdistances": "[2.0, 3.0]"
+}

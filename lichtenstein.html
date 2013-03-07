@@ -3,6 +3,7 @@
 <head>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="jquery-periodic-updater/min/updater.js"></script>
 </head>
 <body>
 <canvas id="distance" width="340" height="340" data-distance="100"></canvas>
@@ -232,6 +233,15 @@ function animateAzimuth(time) {
 
 window.requestAnimationFrame(animateAzimuth);
 window.requestAnimationFrame(animateElevation);
+
+$(function(){                           // Start document ready
+    $.updater({                         // Call the plugin
+        url: 'data.json',             // Request URL
+    },
+    function(result, response){   // Callback method..
+        $('body').append('<li>'+result.upammounts + ' | ' + result.downammounts+'</li>');
+    });
+});
 
 </script>
 </body>
