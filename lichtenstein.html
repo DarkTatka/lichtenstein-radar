@@ -41,6 +41,11 @@ function doubleSigmoid(x, a, b, c, d)
 	return y2 - y1; 
 }
 
+function cutOff(x)
+{
+	var y = doubleSigmoid(x, 70, 20, 0.4, 25)
+	return y;
+}
 function animateElevation(time) {
 	var canvas = $("#elevation")[0];
 	var ctx = canvas.getContext("2d");
@@ -92,7 +97,7 @@ function animateElevation(time) {
 		var trueSignal = value + whiteNoise
 
 		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
-		var cutoff = doubleSigmoid(x, 70, 15, 0.4, 30);
+		var cutoff = cutOff(x);
 
 		var baseline =  whiteNoise + groundClutter + cutoff;
 
@@ -118,7 +123,7 @@ function animateElevation(time) {
 		var trueSignal = value + whiteNoise
 
 		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
-		var cutoff = doubleSigmoid(x, 70, 15, 0.4, 30);
+		var cutoff = cutOff(x);
 
 		var baseline =  whiteNoise + groundClutter + cutoff;
 
@@ -183,7 +188,7 @@ function animateAzimuth(time) {
 		var trueSignal = value + whiteNoise
 
 		var groundClutter = doubleSigmoid(y, 70, canvas.height, 0.4,60);
-		var cutoff = doubleSigmoid(y, 70, 15, 0.4, 30);
+		var cutoff = cutOff(y);
 
 		var baseline =  whiteNoise + groundClutter + cutoff;
 
@@ -207,7 +212,7 @@ function animateAzimuth(time) {
 		var trueSignal = value + whiteNoise
 
 		var groundClutter = doubleSigmoid(y, 70, canvas.height, 0.4,60);
-		var cutoff = doubleSigmoid(y, 70, 15, 0.4, 30);
+		var cutoff = cutOff(y);
 
 		var baseline =  whiteNoise + groundClutter + cutoff;
 
