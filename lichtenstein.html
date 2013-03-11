@@ -11,20 +11,20 @@
 
 <canvas id="azimuth" width="300" height="300"
 	style="padding-left:178px;padding-top:107px"
-	data-leftdistances="[2.0, 4.0]" 
-	data-rightdistances="[2.0, 4.0]" 
+	data-leftdistances="[2.0]" 
+	data-rightdistances="[1.9]" 
 	data-noiseleft="0.1" 
 	data-noiseright="0.1" 
-	data-leftammounts="[1.0, 0.5]"
-	data-rightammounts="[1.0, 0.5]"></canvas>
+	data-leftammounts="[1.0]"
+	data-rightammounts="[0.3]"></canvas>
 <canvas id="elevation" width="300" height="300"
 	style="padding-left:180px"
-	data-updistances="[3.0, 2.0]"
-	data-downdistances="[3.0, 2.0]"
+	data-updistances="[2.0]"
+	data-downdistances="[2.0]"
 	data-noiseup="0.1" 
 	data-noisedown="0.1" 
-	data-upammounts="[1.0, 0.5]"
-	data-downammounts="[1.0, 0.5]"></canvas>
+	data-upammounts="[1.0]"
+	data-downammounts="[0.3]"></canvas>
 
 </div>
 <script>
@@ -66,7 +66,9 @@ function animateElevation(time) {
 	var noiseBaseline = 10;
 
 // prostredni cara
-	ctx.fillStyle = 'black';
+	ctx.fillStyle = '#00EE88';
+	ctx.strokeStyle = "#00EE88"
+	ctx.lineWidth=3;
 	var dotSize = 3;
 
 	for (var i = 0; i < 6; i++) {
@@ -74,6 +76,7 @@ function animateElevation(time) {
 	}
 	ctx.fill();
 	ctx.beginPath();
+
 
 	ctx.moveTo(0, middle);
 	ctx.lineTo(canvas.width, middle)
@@ -161,7 +164,9 @@ function animateAzimuth(time) {
 	var noiseBaseline = 10;
 
 // prostredni cara
-	ctx.fillStyle = 'black';
+	ctx.fillStyle = '#00EE88';
+	ctx.strokeStyle = "#00EE88"
+	ctx.lineWidth=3;
 	var dotSize = 3;
 
 	for (var i = 0; i < 6; i++) {
