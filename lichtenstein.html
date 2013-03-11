@@ -7,7 +7,7 @@
 </head>
 <body style="background-color:rgb(0,0,0)">
 
-<div style="background-image:url(lichtenstein.jpg); background-repeat:no-repeat;padding-bottom:120px">
+<div style="min-width: 1180px; min-height: 686px; background-image:url(lichtenstein.jpg); background-repeat:no-repeat;">
 
 <canvas id="azimuth" width="300" height="300"
 	style="padding-left:178px;padding-top:107px"
@@ -19,12 +19,12 @@
 	data-rightammounts="[0.3]"></canvas>
 <canvas id="elevation" width="300" height="300"
 	style="padding-left:180px"
-	data-updistances="[2.0]"
-	data-downdistances="[2.0]"
+	data-updistances="[2.0, 3.0]"
+	data-downdistances="[2.0, 3.0]"
 	data-noiseup="0.1" 
 	data-noisedown="0.1" 
-	data-upammounts="[1.0]"
-	data-downammounts="[0.3]"></canvas>
+	data-upammounts="[1.0, 1.0]"
+	data-downammounts="[0.3, 0.9]"></canvas>
 
 </div>
 <script>
@@ -49,7 +49,7 @@ function doubleSigmoid(x, a, b, c, d)
 
 function cutOff(x)
 {
-	var y = doubleSigmoid(x, 70, 20, 0.4, 25)
+	var y = doubleSigmoid(x, 70, 20, 0.4, 25);
 	return y;
 }
 function animateElevation(time) {
@@ -67,7 +67,7 @@ function animateElevation(time) {
 
 // prostredni cara
 	ctx.fillStyle = '#00EE88';
-	ctx.strokeStyle = "#00EE88"
+	ctx.strokeStyle = "#00EE88";
 	ctx.lineWidth=3;
 	var dotSize = 3;
 
@@ -84,14 +84,14 @@ function animateElevation(time) {
 	ctx.moveTo(0, highLine);
 
 // ziskani dat pro vykresleni
-	var upDistances = $("#elevation").data().updistances;
-	var upAmmounts = $("#elevation").data().upammounts;
+	var upDistances = $("#elevation").data("updistances");
+	var upAmmounts = $("#elevation").data("upammounts");
 
-	var downDistances =  $("#elevation").data().downdistances;
-	var downAmmounts = $("#elevation").data().downammounts;
+	var downDistances =  $("#elevation").data("downdistances");
+	var downAmmounts = $("#elevation").data("downammounts");
 
-	var upNoise = $("#elevation").data().noiseup*noiseMultiplier+noiseBaseline;
-	var downNoise = $("#elevation").data().noisedown*noiseMultiplier+noiseBaseline;
+	var upNoise = $("#elevation").data("noiseup")*noiseMultiplier+noiseBaseline;
+	var downNoise = $("#elevation").data("noisedown")*noiseMultiplier+noiseBaseline;
 
 
 // horni cara
@@ -101,9 +101,9 @@ function animateElevation(time) {
 			var upDistance = canvas.width - upDistances[i] * (canvas.width/5);
 			value = value + doubleSigmoid(x, upAmmounts[i]*50,upDistance,1,10);
 		}
-		var whiteNoise = Math.random() * upNoise
+		var whiteNoise = Math.random() * upNoise;
 		
-		var trueSignal = value + whiteNoise
+		var trueSignal = value + whiteNoise;
 
 		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
 		var cutoff = cutOff(x);
@@ -113,10 +113,10 @@ function animateElevation(time) {
 		if (trueSignal > baseline) {
 			var signal = trueSignal;
 		} else { 
-			var signal = baseline
+			var signal = baseline;
 		}
 
-		ctx.lineTo(x, highLine - signal)
+		ctx.lineTo(x, highLine - signal);
 	}
 
 // dolnicara
@@ -127,9 +127,9 @@ function animateElevation(time) {
 			var downDistance = canvas.width - downDistances[i] * (canvas.width/5);
 			value = value + doubleSigmoid(x, downAmmounts[i]*50,downDistance,1,10);
 		}
-		var whiteNoise = Math.random() * downNoise
+		var whiteNoise = Math.random() * downNoise;
 
-		var trueSignal = value + whiteNoise
+		var trueSignal = value + whiteNoise;
 
 		var groundClutter = doubleSigmoid(x, 70, canvas.width, 0.4,60);
 		var cutoff = cutOff(x);
@@ -139,10 +139,10 @@ function animateElevation(time) {
 		if (trueSignal > baseline) {
 			var signal = trueSignal;
 		} else { 
-			var signal = baseline
+			var signal = baseline;
 		}
 
-		ctx.lineTo(x, lowLine + signal)
+		ctx.lineTo(x, lowLine + signal);
 	}
 
 	ctx.stroke();
@@ -165,7 +165,7 @@ function animateAzimuth(time) {
 
 // prostredni cara
 	ctx.fillStyle = '#00EE88';
-	ctx.strokeStyle = "#00EE88"
+	ctx.strokeStyle = "#00EE88";
 	ctx.lineWidth=3;
 	var dotSize = 3;
 
@@ -181,22 +181,22 @@ function animateAzimuth(time) {
 
 	ctx.moveTo(leftLine, 0);
 // ziskani dat pro vykresleni
-	var leftDistances = $("#azimuth").data().leftdistances;
-	var leftAmmounts = $("#azimuth").data().leftammounts;
+	var leftDistances = $("#azimuth").data("leftdistances");
+	var leftAmmounts = $("#azimuth").data("leftammounts");
 
-	var rightDistances =  $("#azimuth").data().rightdistances;
-	var rightAmmounts = $("#azimuth").data().rightammounts;
-	var rightNoise = $("#azimuth").data().noiseright*noiseMultiplier+noiseBaseline;
-	var leftNoise = $("#azimuth").data().noiseleft*noiseMultiplier+noiseBaseline;
+	var rightDistances =  $("#azimuth").data("rightdistances");
+	var rightAmmounts = $("#azimuth").data("rightammounts");
+	var rightNoise = $("#azimuth").data("noiseright")*noiseMultiplier+noiseBaseline;
+	var leftNoise = $("#azimuth").data("noiseleft")*noiseMultiplier+noiseBaseline;
 // leva cara
 	for (var y = 0; y < canvas.height; y++, y++, y++) {
-		var value = 0
+		var value = 0;
 		for (var i = 0; i < leftDistances.length; i++) {
 			var leftDistance = canvas.height - leftDistances[i] * (canvas.height/5);
 			value = value + doubleSigmoid(y, leftAmmounts[i]*50,leftDistance,1,10);
 		}
-		var whiteNoise = Math.random() * leftNoise
-		var trueSignal = value + whiteNoise
+		var whiteNoise = Math.random() * leftNoise;
+		var trueSignal = value + whiteNoise;
 
 		var groundClutter = doubleSigmoid(y, 70, canvas.height, 0.4,60);
 		var cutoff = cutOff(y);
@@ -247,10 +247,17 @@ window.requestAnimationFrame(animateElevation);
 $(function(){                           // Start document ready
     $.updater({
 	method: 'get',                         // Call the plugin
-        url: 'data.json',             // Request URL
+        url: 'data.json'             // Request URL
     },
     function(result, response){   // Callback method..
-        $('body').append('<li>'+result.upammounts + ' | ' + result.downammounts+'</li>');
+        $('#elevation').data("updistances", result.updistances);
+        $('#elevation').data("downdistances", result.downdistances);
+        $('#elevation').data("upammounts", result.upammounts);
+        $('#elevation').data("downammounts", result.downamounts);
+        $('#azimuth').data("leftdistances", result.leftdistances);
+        $('#azimuth').data("rightdistances", result.rightdistances);
+        $('#azimuth').data("leftammounts", result.leftammounts);
+        $('#azimuth').data("rightammounts", result.rightammounts);
     });
 });
 
