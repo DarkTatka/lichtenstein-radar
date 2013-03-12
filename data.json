@@ -1,10 +1,44 @@
 {
-    "upammounts"    : [1.0, 1.0],
-    "updistances"   : [2.0, 3.0],
-    "downammounts"  : [1.0, 1.0],
-    "downdistances" : [3.0, 2.0],
-    "leftammounts"  : [0.5, 1.0],
-    "leftdistances" : [2.0, 3.0],
-    "rightammounts" : [1.0, 1.0],
-    "rightdistances": [3.0, 2.0]
+    "antennaSignals": {
+        "top": [
+            {
+                "intensity": 1,
+                "distance": 2
+            },
+            {
+                "intensity": 1,
+                "distance": 3
+            }
+        ],
+        "down": [
+            {
+                "intensity": 1,
+                "distance": 2
+            },
+            {
+                "intensity": 0.5,
+                "distance": 3
+            }
+        ],
+        "left": [
+            {
+                "intensity": 0.3,
+                "distance": 2
+            },
+            {
+                "intensity": 0.7,
+                "distance": 3
+            }
+        ],
+        "right": [
+            {
+                "intensity": 0.7,
+                "distance": 2
+            },
+            {
+                "intensity": 0.3,
+                "distance": 3
+            }
+        ]
+    }
 }

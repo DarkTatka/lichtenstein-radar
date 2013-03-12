@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <!--<script src="jquery.min.js"></script>-->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="jquery-periodic-updater/min/updater.js"></script>
 </head>
@@ -19,15 +20,13 @@
 	data-rightammounts="[0.3]"></canvas>
 <canvas id="elevation" width="300" height="300"
 	style="padding-left:180px"
-	data-updistances="[2.0, 3.0]"
-	data-downdistances="[2.0, 3.0]"
 	data-noiseup="0.1" 
-	data-noisedown="0.1" 
-	data-upammounts="[1.0, 1.0]"
-	data-downammounts="[0.3, 0.9]"></canvas>
+	data-noisedown="0.1" ></canvas>
 
 </div>
 <script>
+    
+    var loadedData = {};
 if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = (function () {
         return window.webkitRequestAnimationFrame ||
@@ -84,11 +83,6 @@ function animateElevation(time) {
 	ctx.moveTo(0, highLine);
 
 // ziskani dat pro vykresleni
-	var upDistances = $("#elevation").data("updistances");
-	var upAmmounts = $("#elevation").data("upammounts");
-
-	var downDistances =  $("#elevation").data("downdistances");
-	var downAmmounts = $("#elevation").data("downammounts");
 
 	var upNoise = $("#elevation").data("noiseup")*noiseMultiplier+noiseBaseline;
 	var downNoise = $("#elevation").data("noisedown")*noiseMultiplier+noiseBaseline;
@@ -97,10 +91,13 @@ function animateElevation(time) {
 // horni cara
 	for (var x = 0; x < canvas.width; x++, x++) {
 		var value = 0;
-		for (var i = 0; i < upDistances.length; i++) {
-			var upDistance = canvas.width - upDistances[i] * (canvas.width/5);
-			value = value + doubleSigmoid(x, upAmmounts[i]*50,upDistance,1,10);
-		}
+                if (loadedData.antennaSignals && loadedData.antennaSignals.top) {
+                    var top = loadedData.antennaSignals.top
+                    for (var i = 0; i < top.length; i++) {
+                            var upDistance = canvas.width - top[i].distance * (canvas.width/5);
+                            value = value + doubleSigmoid(x, top[i].intensity*50,upDistance,1,10);
+                    }
+                }
 		var whiteNoise = Math.random() * upNoise;
 		
 		var trueSignal = value + whiteNoise;
@@ -123,10 +120,13 @@ function animateElevation(time) {
 	ctx.moveTo(0, lowLine);
 	for (var x = 0; x < canvas.width; x++, x++) {
 		var value = 0;		
-		for (var i = 0; i < downDistances.length; i++) {
-			var downDistance = canvas.width - downDistances[i] * (canvas.width/5);
-			value = value + doubleSigmoid(x, downAmmounts[i]*50,downDistance,1,10);
-		}
+                if (loadedData.antennaSignals && loadedData.antennaSignals.down) {
+                    var down = loadedData.antennaSignals.down;
+                    for (var i = 0; i < down.length; i++) {
+                            var downDistance = canvas.width - down[i].distance * (canvas.width/5);
+                            value = value + doubleSigmoid(x, down[i].intensity*50,downDistance,1,10);
+                    }
+                }
 		var whiteNoise = Math.random() * downNoise;
 
 		var trueSignal = value + whiteNoise;
@@ -181,8 +181,6 @@ function animateAzimuth(time) {
 
 	ctx.moveTo(leftLine, 0);
 // ziskani dat pro vykresleni
-	var leftDistances = $("#azimuth").data("leftdistances");
-	var leftAmmounts = $("#azimuth").data("leftammounts");
 
 	var rightDistances =  $("#azimuth").data("rightdistances");
 	var rightAmmounts = $("#azimuth").data("rightammounts");
@@ -191,10 +189,14 @@ function animateAzimuth(time) {
 // leva cara
 	for (var y = 0; y < canvas.height; y++, y++, y++) {
 		var value = 0;
-		for (var i = 0; i < leftDistances.length; i++) {
-			var leftDistance = canvas.height - leftDistances[i] * (canvas.height/5);
-			value = value + doubleSigmoid(y, leftAmmounts[i]*50,leftDistance,1,10);
-		}
+                if (loadedData.antennaSignals && loadedData.antennaSignals.left) {
+                    var left = loadedData.antennaSignals.left;
+                    for (var i = 0; i < left.length; i++) {
+			var leftDistance = canvas.height - left[i].distance * (canvas.height/5);
+			value = value + doubleSigmoid(y, left[i].intensity*50,leftDistance,1,10);
+                    }
+                }
+                
 		var whiteNoise = Math.random() * leftNoise;
 		var trueSignal = value + whiteNoise;
 
@@ -215,10 +217,13 @@ function animateAzimuth(time) {
 	ctx.moveTo(rightLine, 0);
 	for (var y = 0; y < canvas.height; y++, y++, y++) {
 		var value = 0
-		for (var i = 0; i < rightDistances.length; i++) {
-			var rightDistance = canvas.height - rightDistances[i] * (canvas.height/5);
-			value = value + doubleSigmoid(y, rightAmmounts[i]*50,rightDistance,1,10);
-		}
+                if (loadedData.antennaSignals && loadedData.antennaSignals.right) {
+                    var right = loadedData.antennaSignals.right;
+                    for (var i = 0; i < right.length; i++) {
+                            var rightDistance = canvas.height - right[i].distance * (canvas.height/5);
+                            value = value + doubleSigmoid(y, right[i].intensity *50,rightDistance,1,10);
+                    }
+                }
 		var whiteNoise = Math.random() * rightNoise
 		var trueSignal = value + whiteNoise
 
@@ -250,14 +255,7 @@ $(function(){                           // Start document ready
         url: 'data.json'             // Request URL
     },
     function(result, response){   // Callback method..
-        $('#elevation').data("updistances", result.updistances);
-        $('#elevation').data("downdistances", result.downdistances);
-        $('#elevation').data("upammounts", result.upammounts);
-        $('#elevation').data("downammounts", result.downamounts);
-        $('#azimuth').data("leftdistances", result.leftdistances);
-        $('#azimuth').data("rightdistances", result.rightdistances);
-        $('#azimuth').data("leftammounts", result.leftammounts);
-        $('#azimuth').data("rightammounts", result.rightammounts);
+        loadedData = result;
     });
 });
 
