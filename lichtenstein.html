@@ -7,27 +7,25 @@
   <script src="jquery-periodic-updater/min/updater.js"></script>
 </head>
 <body style="background-color:rgb(0,0,0)">
-
-<div style="min-width: 1180px; min-height: 686px; background-image:url(lichtenstein.jpg); background-repeat:no-repeat;">
+<div style="min-width: 1180px; min-height: 686px; background-image:url(lichtenstein.jpg); background-repeat:no-repeat;"
+     id="radarident"
+     data-radarident="mockradarident">
 
 <canvas id="azimuth" width="300" height="300"
 	style="padding-left:178px;padding-top:107px"
-	data-leftdistances="[2.0]" 
-	data-rightdistances="[1.9]" 
 	data-noiseleft="0.1" 
-	data-noiseright="0.1" 
-	data-leftammounts="[1.0]"
-	data-rightammounts="[0.3]"></canvas>
+	data-noiseright="0.1" ></canvas>
 <canvas id="elevation" width="300" height="300"
 	style="padding-left:180px"
 	data-noiseup="0.1" 
 	data-noisedown="0.1" ></canvas>
-
 </div>
 <script>
+    // globalni promena pro nactena data ze serveru
+var loadedData = {};
+
     
-    var loadedData = {};
-if (!window.requestAnimationFrame) {
+    if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = (function () {
         return window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
@@ -252,7 +250,9 @@ window.requestAnimationFrame(animateElevation);
 $(function(){                           // Start document ready
     $.updater({
 	method: 'get',                         // Call the plugin
-        url: 'data.json'             // Request URL
+        url: 'data.json',                       // Request URL
+        data: {ident: $("#radarident").data("radarident")}, // poslana data
+        interval: 1000
     },
     function(result, response){   // Callback method..
         loadedData = result;
